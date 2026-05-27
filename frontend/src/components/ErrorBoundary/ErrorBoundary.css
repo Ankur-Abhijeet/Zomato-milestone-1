@@ -1,0 +1,70 @@
+/* ── Error Boundary fallback ─────────────────────────────────────────────────── */
+
+.eb {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  padding: 24px;
+}
+
+.eb__card {
+  background: var(--bg-card);
+  border: 1px solid rgba(226, 55, 68, 0.25);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px;
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(226, 55, 68, 0.1);
+  animation: scaleIn 0.35s ease forwards;
+}
+
+.eb__icon { font-size: 52px; margin-bottom: 20px; }
+
+.eb__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.eb__message {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.eb__detail {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--accent);
+  text-align: left;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  margin-bottom: 24px;
+}
+
+.eb__btn {
+  padding: 14px 32px;
+  background: linear-gradient(135deg, var(--accent) 0%, #ff4757 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-accent);
+}
+
+.eb__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 32px rgba(226, 55, 68, 0.35);
+}

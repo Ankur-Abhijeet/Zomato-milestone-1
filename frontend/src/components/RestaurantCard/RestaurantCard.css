@@ -1,0 +1,263 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   Zomato AI — Premium Restaurant Card (no image, info-dense)
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.rc {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #ebe5df;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Left accent stripe — slides in on hover */
+.rc::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #e23744 0%, #ff6b35 100%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 2;
+}
+
+.rc:hover::before { opacity: 1; }
+
+.rc:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(226, 55, 68, 0.08);
+  border-color: rgba(226, 55, 68, 0.25);
+}
+
+/* ── Coloured Top Banner ────────────────────────────────────────────────────── */
+.rc__banner {
+  height: 8px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Each card gets a different gradient based on rank — controlled via inline style */
+
+/* ── Card Body ──────────────────────────────────────────────────────────────── */
+.rc__body {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+/* ── Title Row ──────────────────────────────────────────────────────────────── */
+.rc__title-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.rc__name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.rc__rank-badge {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #e23744 0%, #c9202e 100%);
+  color: #ffffff;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 8px rgba(226, 55, 68, 0.35);
+  flex-shrink: 0;
+}
+
+.rc__name {
+  font-size: 16.5px;
+  font-weight: 800;
+  color: #1a1a2e;
+  letter-spacing: -0.015em;
+  margin: 0;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Rating cluster ──────────────────────────────────────────────────────────── */
+.rc__rating-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.rc__rating {
+  font-weight: 800;
+  color: #1a1a2e;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: #fff9f0;
+  border: 1px solid #fde68a;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+}
+
+.rc__star {
+  color: #f59e0b;
+  font-size: 13px;
+}
+
+.rc__ratings-count {
+  color: #9ca3af;
+  font-size: 11.5px;
+}
+
+.rc__divider {
+  color: #d1cbc4;
+  font-size: 11px;
+}
+
+.rc__match-pct {
+  color: #e23744;
+  font-weight: 800;
+  font-size: 12px;
+  background: rgba(226, 55, 68, 0.07);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.rc__distance {
+  color: #4b5563;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* ── Cuisine chips ──────────────────────────────────────────────────────────── */
+.rc__cuisine-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.rc__cuisine-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: #f8f4f0;
+  border: 1px solid #ebe5df;
+  border-radius: var(--radius-full);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #5a4a48;
+  transition: var(--transition);
+}
+
+.rc__cuisine-chip:hover {
+  background: #feeceb;
+  border-color: rgba(226,55,68,0.2);
+  color: #e23744;
+}
+
+/* ── Meta row (cost + location) ─────────────────────────────────────────────── */
+.rc__meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  color: #9ca3af;
+  flex-wrap: wrap;
+}
+
+.rc__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rc__cost { color: #16a34a; font-weight: 600; }
+.rc__location { color: #6b7280; }
+
+/* ── Why this fits box ──────────────────────────────────────────────────────── */
+.rc__why-fits-box {
+  background: linear-gradient(135deg, #f8f4f0 0%, #fef9f8 100%);
+  border: 1px solid #ebe5df;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+  transition: background 0.2s ease;
+}
+
+.rc:hover .rc__why-fits-box {
+  background: linear-gradient(135deg, #feeceb 0%, #fff8f7 100%);
+  border-color: rgba(226,55,68,0.15);
+}
+
+.rc__ai-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.rc__why-fits-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.rc__explanation-text {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: #5a4a48;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.rc__explanation-text--expanded {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.rc__expand-btn {
+  background: #ffffff;
+  border: 1px solid #ebe5df;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  color: #e23744;
+  cursor: pointer;
+  transition: var(--transition);
+  align-self: flex-end;
+}
+
+.rc__expand-btn:hover {
+  background: #feeceb;
+  border-color: rgba(226,55,68,0.3);
+}

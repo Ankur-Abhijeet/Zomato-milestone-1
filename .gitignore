@@ -1,0 +1,26 @@
+# Node
+node_modules/
+dist/
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+ENV/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Cache and logs
+.cache/
+*.log
+
+# Editor
+.vscode/
+.idea/
