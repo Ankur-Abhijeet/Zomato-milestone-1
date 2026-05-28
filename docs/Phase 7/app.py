@@ -113,16 +113,16 @@ min_b, max_b = current_budget
 
 # Calculate matching restaurants for the selected location and budget
 from data import matching
-matching_restaurants = [
+matching_budget = [
     r for r in repo.all() 
     if r.cost_inr is not None 
     and min_b <= r.cost_inr <= max_b
     and matching.matches_location(r, location)
 ]
-matching_count = len(matching_restaurants)
+budget_count = len(matching_budget)
 
 budget_range = st.sidebar.slider(
-    f"Price Range for Two (₹) ({matching_count} available)", 
+    f"Price Range for Two (₹) ({budget_count} available)", 
     min_value=150, 
     max_value=3000, 
     value=(500, 2000), 
@@ -131,10 +131,20 @@ budget_range = st.sidebar.slider(
 )
 min_budget, max_budget = budget_range
 
-# Dynamically calculate the top 8 cuisines available in this subset
+# Peek at the current rating value from session state
+current_rating = st.session_state.get("rating_slider", 3.0)
+
+# Further filter by minimum rating to get the final pool of restaurants
+matching_rating = [
+    r for r in matching_budget 
+    if r.rating is not None and r.rating >= current_rating
+]
+rating_count = len(matching_rating)
+
+# Dynamically calculate the top 8 cuisines available in this fully filtered subset
 from collections import Counter
 cuisine_counts = Counter()
-for r in matching_restaurants:
+for r in matching_rating:
     for c in r.cuisines:
         cuisine_counts[c] += 1
 
@@ -149,7 +159,14 @@ selected_top_cuisines = st.sidebar.pills(
 # Simple comma-separated cuisines for Streamlit
 cuisines_input = st.sidebar.text_input("Other Cuisines (comma separated)", value="")
 
-min_rating = st.sidebar.slider("Minimum Rating", min_value=1.0, max_value=5.0, value=3.0, step=0.1)
+min_rating = st.sidebar.slider(
+    f"Minimum Rating ({rating_count} available)", 
+    min_value=1.0, 
+    max_value=5.0, 
+    value=3.0, 
+    step=0.1,
+    key="rating_slider"
+)
 
 additional = st.sidebar.text_area("Specific Cravings or Needs", value="", placeholder="e.g., family friendly, open late")
 
