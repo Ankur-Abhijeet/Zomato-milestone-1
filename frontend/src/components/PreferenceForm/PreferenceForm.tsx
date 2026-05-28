@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useRef, useState } from 'react'
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react'
 import type { BudgetChoice, RecommendRequest } from '../../types/api'
 import { Spinner } from '../ui'
 import './PreferenceForm.css'
@@ -26,6 +26,14 @@ export function PreferenceForm({ onSubmit, isLoading, locationCategories }: Prop
   const [locationError, setLocationError] = useState('')
 
   const cuisineInputRef = useRef<HTMLInputElement>(null)
+
+  // ── Auto-select first location when categories load ────────────────────────
+  useEffect(() => {
+    if (locationCategories && locationCategories.length > 0 && !location) {
+      setLocation(locationCategories[0].query)
+      setLocationError('')
+    }
+  }, [locationCategories, location])
 
   // ── Cuisine chip management ────────────────────────────────────────────────
   const addCuisine = (raw: string) => {
