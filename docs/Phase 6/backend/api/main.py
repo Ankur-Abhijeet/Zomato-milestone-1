@@ -49,19 +49,7 @@ logger = logging.getLogger(__name__)
 limiter = Limiter(key_func=get_remote_address, default_limits=[])
 
 
-def _parse_allowed_origins() -> list[str]:
-    """Build CORS origin list from defaults + ALLOWED_ORIGINS env var."""
-    defaults = [
-        "http://localhost:5173",  # Vite dev server (Phase 5b)
-        "http://localhost:3000",  # CRA fallback
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-    ]
-    extra = os.getenv("ALLOWED_ORIGINS", "")
-    if extra.strip():
-        extras = [o.strip().rstrip("/") for o in extra.split(",") if o.strip()]
-        defaults.extend(extras)
-    return defaults
+
 
 
 @asynccontextmanager
@@ -115,11 +103,10 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestIDMiddleware)
 
     # ── CORS ──────────────────────────────────────────────────────────────────
-    allowed_origins = _parse_allowed_origins()
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=allowed_origins,
-        allow_credentials=True,
+        allow_origins=["*"],
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )
