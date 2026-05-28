@@ -8,6 +8,11 @@ if backend_path not in sys.path:
 
 import streamlit as st
 import asyncio
+import os
+
+# Sync Streamlit secrets to environment variables for Pydantic Settings
+if hasattr(st, "secrets") and "GROQ_API_KEY" in st.secrets:
+    os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
 # Import core services from Phase 6 backend
 from config.settings import get_settings
