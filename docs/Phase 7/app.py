@@ -36,10 +36,14 @@ def load_system():
     settings = get_settings()
     repo = RestaurantRepository(settings)
     repo.load()
-    return settings, repo
+    
+    # Dynamically extract and sort all unique locations from the dataset
+    unique_locations = sorted(list(set(r.location for r in repo.all() if r.location)))
+    
+    return settings, repo, unique_locations
 
 try:
-    settings, repo = load_system()
+    settings, repo, available_locations = load_system()
 except Exception as e:
     st.error(f"Failed to load dataset: {e}")
     st.stop()
@@ -49,7 +53,9 @@ st.sidebar.title("Find Your Perfect Meal")
 st.sidebar.markdown("Tell us what you're craving.")
 
 with st.sidebar.form("preference_form"):
-    location = st.text_input("Location*", value="Basavanagudi")
+    # Default to Koramangala if available, else the first option
+    default_idx = available_locations.index("Koramangala") if "Koramangala" in available_locations else 0
+    location = st.selectbox("Location*", options=available_locations, index=default_idx)
     
     budget = st.selectbox(
         "Budget",
