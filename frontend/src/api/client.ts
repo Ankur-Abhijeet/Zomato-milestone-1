@@ -6,7 +6,8 @@
 
 import type { MetaResponse, RecommendRequest, RecommendResponse } from '../types/api'
 
-const BASE = '/api/v1'
+// Use VITE_API_BASE_URL if provided (e.g. on Vercel connecting to Render), otherwise fallback to Vite proxy
+const BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 
 export class ApiClientError extends Error {
   public readonly status: number
