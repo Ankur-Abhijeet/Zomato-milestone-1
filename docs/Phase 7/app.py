@@ -31,6 +31,8 @@ st.set_page_config(
 @st.cache_resource
 def load_system():
     """Load settings and repository once per server start."""
+    # Bust the lru_cache so it picks up the newly injected environment variable
+    get_settings.cache_clear()
     settings = get_settings()
     repo = RestaurantRepository(settings)
     repo.load()
