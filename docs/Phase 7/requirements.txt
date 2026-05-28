@@ -1,11 +1,6 @@
-eval-type-backport>=0.2.0
-datasets>=2.19.0
-pandas>=2.0.0
-pyarrow>=14.0.0
-pydantic>=2.5.0
-pydantic-settings>=2.1.0
-python-dotenv>=1.0.0
-rich>=13.7.0
-groq>=0.11.0
-httpx>=0.27.0
-streamlit>=1.35.0
+datasets
+pydantic
+pydantic-settings
+python-dotenv
+groq
+streamlit
