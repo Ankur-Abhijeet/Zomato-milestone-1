@@ -106,14 +106,27 @@ export default function Home() {
   useEffect(() => {
     const ctrl = new AbortController()
     
-    const fetchMeta = async (retries = 5) => {
+    const fetchMeta = async (retries = 20) => {
       try {
         const data = await getMeta(ctrl.signal)
         setMeta(data)
       } catch (err: any) {
         if (err.name === 'AbortError') return
         if (retries > 0) {
-          setTimeout(() => fetchMeta(retries - 1), 2000)
+          setTimeout(() => fetchMeta(retries - 1), 3000)
+        } else {
+          // Exhausted retries, show the error to the user!
+          const rawMsg = err.message || 'Unknown network error'
+          const id = `toast-${uniqueId}-meta-fail`
+          setToasts((prev) => [
+            ...prev,
+            {
+              id,
+              variant: 'error',
+              title: 'Backend Unreachable',
+              message: `Could not load location data: ${rawMsg}. If this is a CORS error, check your ALLOWED_ORIGINS.`,
+            },
+          ])
         }
       }
     }
