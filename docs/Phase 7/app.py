@@ -108,12 +108,26 @@ with st.sidebar.form("preference_form"):
         format_func=lambda x: f"{x} ({location_counts[x]} restaurants)"
     )
     
+    # Peek at the current slider value from session state to calculate the real-time count
+    current_budget = st.session_state.get("budget_slider", (500, 2000))
+    min_b, max_b = current_budget
+    
+    # Calculate how many restaurants match BOTH the selected location and this budget
+    from data import matching
+    matching_count = sum(
+        1 for r in repo.all() 
+        if r.cost_inr is not None 
+        and min_b <= r.cost_inr <= max_b
+        and matching.matches_location(r, location)
+    )
+    
     budget_range = st.slider(
-        "Price Range for Two (₹)", 
+        f"Price Range for Two (₹) ({matching_count} available)", 
         min_value=150, 
         max_value=3000, 
         value=(500, 2000), 
-        step=50
+        step=50,
+        key="budget_slider"
     )
     min_budget, max_budget = budget_range
     
