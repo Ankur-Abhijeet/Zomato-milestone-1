@@ -39,11 +39,52 @@ def load_system():
     
     from collections import Counter
     
-    # Count the number of restaurants in each broad 'city' category
-    location_counts = Counter(r.city for r in repo.all() if r.city)
+    # 7 Macro Regions for Bangalore, plus Rest of India
+    MACRO_REGIONS = {
+        "Bangalore - Central (MG Road, Brigade, etc.)": ["mg road", "brigade", "church", "lavelle", "residency", "shivajinagar", "central", "richmond"],
+        "Bangalore - South (Jayanagar, JP Nagar, etc.)": ["jayanagar", "jp nagar", "banashankari", "basavanagudi", "bannerghatta", "kumaraswamy"],
+        "Bangalore - South-East (Koramangala, BTM, HSR)": ["koramangala", "btm", "hsr", "madiwala", "bommanahalli"],
+        "Bangalore - East (Indiranagar, Old Airport)": ["indiranagar", "old airport", "domlur", "cv raman", "hal"],
+        "Bangalore - Tech Corridors (Whitefield, Marathahalli, Bellandur)": ["whitefield", "marathahalli", "bellandur", "sarjapur", "brookefield", "kr puram", "mahadevapura"],
+        "Bangalore - North (Kalyan Nagar, Kammanahalli, etc.)": ["kalyan nagar", "kammanahalli", "frazer town", "rt nagar", "hebbal", "yelahanka", "sanjay nagar"],
+        "Bangalore - West (Malleshwaram, Rajajinagar, etc.)": ["malleshwaram", "rajajinagar", "yeshwanthpur", "basaveshwara", "vijay nagar", "nagarbhavi"],
+        "Bangalore - South Outer (Electronic City)": ["electronic city", "e-city"],
+        "Delhi NCR (Delhi, Gurgaon, Noida)": ["delhi", "gurgaon", "noida", "ncr"],
+        "Mumbai Metropolitan Region": ["mumbai", "bombay", "bandra", "andheri"],
+        "Rest of India (Chennai, Hyderabad, Pune)": ["chennai", "hyderabad", "pune", "kolkata"]
+    }
+
+    def assign_macro_region(restaurant):
+        # We check the clean Zomato 'listed_in_city' or fallback to area/city
+        search_text = (restaurant.extras.get("listed_in_city") or restaurant.area or restaurant.city or "").lower()
+        for region_name, keywords in MACRO_REGIONS.items():
+            if any(k in search_text for k in keywords):
+                return region_name
+        return "Bangalore - Other"
+        
+    # Pre-calculate counts for each macro region
+    location_counts = Counter()
+    for r in repo.all():
+        location_counts[assign_macro_region(r)] += 1
+        
+    # Ensure all regions (even empty ones like Delhi) show up for the user
+    for region in MACRO_REGIONS.keys():
+        if region not in location_counts:
+            location_counts[region] = 0
+
+    unique_locations = list(MACRO_REGIONS.keys()) + ["Bangalore - Other"]
     
-    # Sort the available broad location categories alphabetically
-    unique_locations = sorted(list(location_counts.keys()))
+    # Monkey-patch matches_location so the backend understands our macro-regions
+    from data import matching
+    if not hasattr(matching, "_original_matches_location"):
+        matching._original_matches_location = matching.matches_location
+        
+        def custom_matches_location(restaurant, query):
+            if query in MACRO_REGIONS or query == "Bangalore - Other":
+                return assign_macro_region(restaurant) == query
+            return matching._original_matches_location(restaurant, query)
+            
+        matching.matches_location = custom_matches_location
     
     return settings, repo, unique_locations, location_counts
 
@@ -59,10 +100,10 @@ st.sidebar.markdown("Tell us what you're craving.")
 
 with st.sidebar.form("preference_form"):
     # Default to a popular area if available, else the first option
-    default_idx = available_locations.index("Koramangala 5th Block") if "Koramangala 5th Block" in available_locations else 0
+    default_idx = available_locations.index("Bangalore - South-East (Koramangala, BTM, HSR)") if "Bangalore - South-East (Koramangala, BTM, HSR)" in available_locations else 0
     
     location = st.selectbox(
-        "Location*", 
+        "Location / Region*", 
         options=available_locations, 
         index=default_idx,
         format_func=lambda x: f"{x} ({location_counts[x]} restaurants)"
