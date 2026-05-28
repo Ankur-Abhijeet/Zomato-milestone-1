@@ -102,12 +102,24 @@ export default function Home() {
   const riderRef = useRef<HTMLDivElement>(null)
   const roadRef = useRef<HTMLDivElement>(null)
 
-  // Load meta on mount
+  // Load meta on mount with retries (Render backend might return 503 while warming up)
   useEffect(() => {
     const ctrl = new AbortController()
-    getMeta(ctrl.signal)
-      .then(setMeta)
-      .catch(() => { /* non-fatal */ })
+    
+    const fetchMeta = async (retries = 5) => {
+      try {
+        const data = await getMeta(ctrl.signal)
+        setMeta(data)
+      } catch (err: any) {
+        if (err.name === 'AbortError') return
+        if (retries > 0) {
+          setTimeout(() => fetchMeta(retries - 1), 2000)
+        }
+      }
+    }
+    
+    fetchMeta()
+    
     return () => ctrl.abort()
   }, [])
 
