@@ -37,13 +37,18 @@ def load_system():
     repo = RestaurantRepository(settings)
     repo.load()
     
-    # Dynamically extract and sort all unique locations from the dataset
-    unique_locations = sorted(list(set(r.location_display for r in repo.all() if r.location_display and r.location_display != "Unknown")))
+    from collections import Counter
     
-    return settings, repo, unique_locations
+    # Count the number of restaurants in each broad 'city' category
+    location_counts = Counter(r.city for r in repo.all() if r.city)
+    
+    # Sort the available broad location categories alphabetically
+    unique_locations = sorted(list(location_counts.keys()))
+    
+    return settings, repo, unique_locations, location_counts
 
 try:
-    settings, repo, available_locations = load_system()
+    settings, repo, available_locations, location_counts = load_system()
 except Exception as e:
     st.error(f"Failed to load dataset: {e}")
     st.stop()
@@ -53,9 +58,15 @@ st.sidebar.title("Find Your Perfect Meal")
 st.sidebar.markdown("Tell us what you're craving.")
 
 with st.sidebar.form("preference_form"):
-    # Default to Koramangala if available, else the first option
-    default_idx = available_locations.index("Koramangala") if "Koramangala" in available_locations else 0
-    location = st.selectbox("Location*", options=available_locations, index=default_idx)
+    # Default to a popular area if available, else the first option
+    default_idx = available_locations.index("Koramangala 5th Block") if "Koramangala 5th Block" in available_locations else 0
+    
+    location = st.selectbox(
+        "Location*", 
+        options=available_locations, 
+        index=default_idx,
+        format_func=lambda x: f"{x} ({location_counts[x]} restaurants)"
+    )
     
     budget = st.selectbox(
         "Budget",
