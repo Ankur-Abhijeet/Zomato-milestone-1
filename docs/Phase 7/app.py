@@ -111,14 +111,15 @@ location = st.sidebar.selectbox(
 current_budget = st.session_state.get("budget_slider", (500, 2000))
 min_b, max_b = current_budget
 
-# Calculate how many restaurants match BOTH the selected location and this budget
+# Calculate matching restaurants for the selected location and budget
 from data import matching
-matching_count = sum(
-    1 for r in repo.all() 
+matching_restaurants = [
+    r for r in repo.all() 
     if r.cost_inr is not None 
     and min_b <= r.cost_inr <= max_b
     and matching.matches_location(r, location)
-)
+]
+matching_count = len(matching_restaurants)
 
 budget_range = st.sidebar.slider(
     f"Price Range for Two (₹) ({matching_count} available)", 
@@ -130,8 +131,23 @@ budget_range = st.sidebar.slider(
 )
 min_budget, max_budget = budget_range
 
+# Dynamically calculate the top 8 cuisines available in this subset
+from collections import Counter
+cuisine_counts = Counter()
+for r in matching_restaurants:
+    for c in r.cuisines:
+        cuisine_counts[c] += 1
+
+top_cuisines = [c for c, _ in cuisine_counts.most_common(8)]
+
+selected_top_cuisines = st.sidebar.multiselect(
+    "Popular Cuisines Here", 
+    options=top_cuisines,
+    placeholder="Choose from top cuisines..."
+)
+
 # Simple comma-separated cuisines for Streamlit
-cuisines_input = st.sidebar.text_input("Cuisines (comma separated)", value="")
+cuisines_input = st.sidebar.text_input("Other Cuisines (comma separated)", value="")
 
 min_rating = st.sidebar.slider("Minimum Rating", min_value=1.0, max_value=5.0, value=3.0, step=0.1)
 
@@ -148,7 +164,9 @@ if submitted:
         st.error("Please provide a location.")
     else:
         with st.spinner("Analyzing preferences and searching restaurants..."):
+            # Combine multi-select and text inputs
             cuisines = [c.strip() for c in cuisines_input.split(",") if c.strip()]
+            cuisines.extend(selected_top_cuisines)
             
             try:
                 # Inject the strict budget bounds into the LLM's additional context
