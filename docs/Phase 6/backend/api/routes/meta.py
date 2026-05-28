@@ -15,7 +15,6 @@ from fastapi import APIRouter
 from api.deps import RepoDep, SettingsDep
 from api.schemas.response import MetaResponse
 from api.utils.budget import budget_band_descriptions
-from data.matching import MACRO_REGIONS
 
 router = APIRouter(prefix="/api/v1", tags=["meta"])
 
@@ -30,28 +29,26 @@ router = APIRouter(prefix="/api/v1", tags=["meta"])
     ),
 )
 async def get_meta(settings: SettingsDep, repo: RepoDep) -> MetaResponse:
-    counts = {region: 0 for region in MACRO_REGIONS}
-    others_count = 0
+    counts: dict[str, int] = {}
     
     for r in repo.all():
-        city_lower = r.city.lower() if r.city else ""
-        area_lower = r.area.lower() if r.area else ""
+        # Fallback to city or 'Unknown' if listed_in_city is missing
+        zone = r.extras.get("listed_in_city") if r.extras else None
+        if not zone:
+            zone = r.city or "Unknown"
         
-        matched_macro = False
-        for region in MACRO_REGIONS:
-            if region.lower() in area_lower or region.lower() in city_lower:
-                counts[region] += 1
-                matched_macro = True
-                break
-                
-        if not matched_macro:
-            others_count += 1
+        # Clean up the zone name
+        zone = str(zone).title()
+        counts[zone] = counts.get(zone, 0) + 1
             
     location_categories = []
-    for region in MACRO_REGIONS:
-        location_categories.append({"label": region, "query": region, "count": counts[region]})
-    
-    location_categories.append({"label": "Others", "query": "__others__", "count": others_count})
+    # Sort alphabetically as requested
+    for zone in sorted(counts.keys()):
+        location_categories.append({
+            "label": zone,
+            "query": f"__zone_{zone.lower()}__",
+            "count": counts[zone]
+        })
 
     return MetaResponse(
         budget_bands=budget_band_descriptions(settings),

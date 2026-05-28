@@ -5,35 +5,7 @@ from __future__ import annotations
 from data.preprocessor import normalize_city_key, resolve_city_alias
 from models.restaurant import Restaurant
 
-MACRO_REGIONS = sorted([
-    "Banashankari",
-    "Bannerghatta Road",
-    "Basavanagudi",
-    "Bellandur",
-    "Brigade Road",
-    "BTM",
-    "Church Street",
-    "Electronic City",
-    "Frazer Town",
-    "HSR Layout",
-    "Indiranagar",
-    "Jayanagar",
-    "JP Nagar",
-    "Kalyan Nagar",
-    "Kammanahalli",
-    "Koramangala",
-    "Lavelle Road",
-    "Malleshwaram",
-    "Marathahalli",
-    "MG Road",
-    "New BEL Road",
-    "Rajajinagar",
-    "Residency Road",
-    "Richmond Road",
-    "Sarjapur Road",
-    "Ulsoor",
-    "Whitefield"
-])
+
 
 
 def matches_location(restaurant: Restaurant, query: str) -> bool:
@@ -42,13 +14,14 @@ def matches_location(restaurant: Restaurant, query: str) -> bool:
         return True
 
     # ── Handle macro-region special queries ───────────────────────────────────
-    if q == "__others__":
-        city_lower = restaurant.city.lower() if restaurant.city else ""
-        area_lower = restaurant.area.lower() if restaurant.area else ""
-        for region in MACRO_REGIONS:
-            if region.lower() in area_lower or region.lower() in city_lower:
-                return False
-        return True
+    if q.startswith("__zone_") and q.endswith("__"):
+        target_zone = q[7:-2] # Extract "xyz" from "__zone_xyz__"
+        
+        zone = restaurant.extras.get("listed_in_city") if restaurant.extras else None
+        if not zone:
+            zone = restaurant.city or "Unknown"
+            
+        return zone.lower() == target_zone
 
     canonical = resolve_city_alias(query)
     city_key = normalize_city_key(restaurant.city)
