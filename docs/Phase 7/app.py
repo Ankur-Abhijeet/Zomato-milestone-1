@@ -181,7 +181,8 @@ if submitted:
                 
                 # 2. Integration Layer (Filter & Cap)
                 integration_service = IntegrationService(repo, settings)
-                integration = integration_service.run(prefs, top_k=5)
+                # Ask LLM for top 10 so we have plenty of backups to replace duplicates
+                integration = integration_service.run(prefs, top_k=10)
                 
                 # Show filter stats
                 stats = integration.filter_result.step_counts
@@ -203,18 +204,23 @@ if submitted:
                     if result.summary:
                         st.info(result.summary)
                     
-                    # Deduplicate by name to hide multiple branches of the same restaurant
+                    # Deduplicate by name and cap at exactly 5 distinct brands
                     seen = set()
                     deduped_recommendations = []
+                    duplicates_skipped = 0
+                    
                     for r in result.recommendations:
                         key = r.name.casefold().strip()
                         if key not in seen:
                             seen.add(key)
                             deduped_recommendations.append(r)
+                            if len(deduped_recommendations) == 5:
+                                break
+                        else:
+                            duplicates_skipped += 1
                             
-                    hidden_count = len(result.recommendations) - len(deduped_recommendations)
-                    if hidden_count > 0:
-                        st.caption(f"💡 Hidden {hidden_count} duplicate branches to show you more variety.")
+                    if duplicates_skipped > 0:
+                        st.caption(f"💡 Replaced {duplicates_skipped} duplicate branches to ensure you get 5 distinct options.")
                     
                     # Display the recommendation cards
                     for i, r in enumerate(deduped_recommendations, start=1):
