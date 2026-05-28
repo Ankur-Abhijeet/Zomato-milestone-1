@@ -50,13 +50,9 @@ def load_restaurants(path: Path) -> list[Restaurant]:
 def _sanitize_record(row: dict[str, Any]) -> dict[str, Any]:
     """Coerce pandas/parquet NaN floats back to None for Pydantic."""
     cleaned = dict(row)
-    for key in ("cost_inr", "rating", "votes"):
-        value = cleaned.get(key)
+    for key, value in cleaned.items():
         if isinstance(value, float) and math.isnan(value):
             cleaned[key] = None
-    band = cleaned.get("budget_band")
-    if band is not None and (isinstance(band, float) and math.isnan(band)):
-        cleaned["budget_band"] = None
     return cleaned
 
 
