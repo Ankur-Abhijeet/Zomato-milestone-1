@@ -107,6 +107,7 @@ flowchart LR
 | 5b | Frontend | Planned | Preference form + recommendation results UI |
 | 5c | Output contract | Planned | Stable JSON for UI; dedupe display names |
 | 6 | Hardening | Optional | Tests, Docker, CI, observability, rate limits |
+| 7 | **Streamlit UI** | Alternative | **Streamlit** app wrapping core Python services directly |
 
 ---
 
@@ -638,6 +639,26 @@ services:
 
 ---
 
+## Phase 7: Streamlit Deployment (Alternative UI)
+
+**Goal:** Provide a rapid-prototyping, pure Python alternative to the Phase 5 React/FastAPI stack by building a Streamlit dashboard that talks directly to the core services.
+
+| Component | Responsibility |
+|-----------|----------------|
+| **`app.py`** | Main Streamlit entrypoint; renders the sidebar form and main results area. |
+| **State Management** | `st.session_state` to track loaded dataset, current preferences, and LLM results. |
+| **Direct Core Integration** | Imports `IntegrationService` and `RecommendationEngine` directly without HTTP API boundaries. |
+| **Cloud Deployment** | `requirements.txt` configured for easy 1-click deployment on Streamlit Community Cloud. |
+
+### Exit criteria (Phase 7)
+
+- [ ] `streamlit run app.py` launches a local web UI
+- [ ] UI captures all inputs (location, budget, cuisine, rating)
+- [ ] UI displays formatted recommendation cards based on Groq output
+- [ ] Deployed successfully on Streamlit Cloud
+
+---
+
 ## End-to-End Request Flow (Web — After Phase 5)
 
 Sequence for a single recommendation request from the browser:
@@ -698,6 +719,7 @@ flowchart TD
     P5B[Phase 5b: Frontend]
     P5C[Phase 5c: Output polish]
     P6[Phase 6: Hardening]
+    P7[Phase 7: Streamlit UI]
 
     P0 --> P1
     P0 --> P2
@@ -710,9 +732,11 @@ flowchart TD
     P5A --> P5C
     P5B --> P5C
     P5C --> P6
+    P4 --> P7
 ```
 
 **Minimum viable product (web):** Phases 0–4 (done) → **5a** (API) → **5b** (UI) → **5c** (dedupe + polish) → **6** (deploy).
+Alternatively: Phases 0–4 (done) → **7** (Streamlit UI).
 
 Phases **5a** and **5b** can be developed in parallel once the API contract (OpenAPI) is agreed.
 
@@ -729,6 +753,7 @@ Phases **5a** and **5b** can be developed in parallel once the API contract (Ope
 | **5** | **Phase 5b** | React form + results cards against local API |
 | **6** | **Phase 5c** | Dedupe, filter stats in UI, budget helper copy |
 | 7 | Phase 6 | Docker Compose, tests, CI, deploy |
+| **8 (Alt)** | **Phase 7** | Streamlit UI build and cloud deployment |
 
 ---
 
