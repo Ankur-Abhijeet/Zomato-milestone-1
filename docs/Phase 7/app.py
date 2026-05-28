@@ -140,10 +140,10 @@ for r in matching_restaurants:
 
 top_cuisines = [c for c, _ in cuisine_counts.most_common(8)]
 
-selected_top_cuisines = st.sidebar.multiselect(
+selected_top_cuisines = st.sidebar.pills(
     "Popular Cuisines Here", 
     options=top_cuisines,
-    placeholder="Choose from top cuisines..."
+    selection_mode="multi"
 )
 
 # Simple comma-separated cuisines for Streamlit
