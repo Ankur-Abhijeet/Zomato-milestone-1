@@ -108,10 +108,10 @@ with st.sidebar.form("preference_form"):
         format_func=lambda x: f"{x} ({location_counts[x]} restaurants)"
     )
     
-    budget = st.selectbox(
-        "Budget",
+    budget = st.select_slider(
+        "Budget for Two",
         options=["low", "medium", "high"],
-        index=1,
+        value="medium",
         format_func=lambda x: {"low": "💸 Low (≤ ₹500)", "medium": "💳 Medium", "high": "💎 High (> ₹1,500)"}[x]
     )
     
