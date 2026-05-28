@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import random
 from typing import List
 
 from config.settings import Settings, get_settings
@@ -15,19 +16,16 @@ def select_candidates(
     settings: Settings | None = None,
 ) -> List[Restaurant]:
     """
-    Return top-N candidates sorted by rating, votes, then name (stable, reproducible).
+    Return a random sample of candidates to give the AI a diverse selection.
     """
     settings = settings or get_settings()
     limit = cap if cap is not None else settings.candidate_cap
     limit = min(max(1, limit), settings.candidate_cap_max)
 
-    sorted_rows = sorted(
-        restaurants,
-        key=lambda r: (
-            -(r.rating or 0.0),
-            -(r.votes or 0),
-            r.name.lower(),
-            r.id,
-        ),
-    )
-    return sorted_rows[:limit]
+    if len(restaurants) <= limit:
+        # Shuffle them anyway so the AI doesn't see the exact same order
+        shuffled = list(restaurants)
+        random.shuffle(shuffled)
+        return shuffled
+
+    return random.sample(restaurants, limit)
