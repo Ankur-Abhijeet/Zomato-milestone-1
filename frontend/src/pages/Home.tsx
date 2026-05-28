@@ -263,6 +263,16 @@ export default function Home() {
                 ))}
               </div>
             </div>
+
+            <div className="home__hero-form-wrapper">
+              <PreferenceForm onSubmit={handleSubmit} isLoading={isLoading} />
+              {meta && (
+                <div className="home__connected-badge" style={{ borderTop: 'none', marginTop: '12px' }}>
+                  <span className="home__connected-dot" />
+                  Connected · {(51717).toLocaleString()}+ restaurants ready
+                </div>
+              )}
+            </div>
           </div>
 
           {/* ── Scroll-Driven Rider Road ─────────────────────────────────── */}
@@ -310,27 +320,19 @@ export default function Home() {
 
       {/* ── Main Two-Column Layout ───────────────────────────────────────── */}
       <main className="home__main">
-        <div className="home__layout">
+        <div className="home__layout" style={!hasResults ? { display: 'block' } : undefined}>
 
-          {/* Left Sidebar */}
-          <aside className="home__sidebar">
-            {showForm || !hasResults ? (
-              <>
+          {/* Left Sidebar (Only visible when results are loaded) */}
+          {hasResults && (
+            <aside className="home__sidebar">
+              {showForm ? (
                 <PreferenceForm onSubmit={handleSubmit} isLoading={isLoading} />
+              ) : (
+                <>
+                  <h2 className="home__sidebar-title">Your AI-Powered Picks</h2>
 
-                {meta && (
-                  <div className="home__connected-badge">
-                    <span className="home__connected-dot" />
-                    Connected · {(51717).toLocaleString()}+ restaurants ready
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <h2 className="home__sidebar-title">Your AI-Powered Picks</h2>
-
-                {/* Reasoning Bubble */}
-                <div className="home__reasoning-bubble">
+                  {/* Reasoning Bubble */}
+                  <div className="home__reasoning-bubble">
                   <span className="home__reasoning-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '22px', height: '22px', display: 'block', color: '#e23744' }}>
                       <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-4.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z" />
@@ -378,8 +380,9 @@ export default function Home() {
                   <span>Change Filters</span>
                 </button>
               </>
-            )}
-          </aside>
+              )}
+            </aside>
+          )}
 
           {/* Right Results */}
           <section className="home__content">

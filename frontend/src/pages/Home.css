@@ -187,17 +187,16 @@
 .home__hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(160deg,
-    #0d0d0d 0%,
-    #1a0608 30%,
-    #2d0a10 60%,
-    #1a0a0c 100%
-  );
+  background: 
+    linear-gradient(180deg, rgba(226, 55, 68, 0.8) 0%, rgba(26, 10, 12, 0.6) 30%, rgba(13, 13, 13, 0.9) 100%),
+    url('https://images.unsplash.com/photo-1606491956689-2ea866880c84?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
   padding: 64px 48px 72px;
   z-index: 1;
-  min-height: 380px;
+  min-height: 600px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 40px;
 }
 
 /* Parallax background orbs */
@@ -334,11 +333,40 @@
 }
 
 .home__hero-cuisine-pill:hover {
-  background: rgba(226, 55, 68, 0.25);
-  border-color: rgba(226, 55, 68, 0.5);
+  background: rgba(226, 55, 68, 0.6);
+  border-color: rgba(226, 55, 68, 0.8);
   color: #ffffff;
   transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 6px 20px rgba(226, 55, 68, 0.2);
+  box-shadow: 0 6px 20px rgba(226, 55, 68, 0.3);
+}
+
+/* Form Wrapper in Hero */
+.home__hero-form-wrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 500px;
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.8s ease 0.2s both;
+}
+
+@media (max-width: 1024px) {
+  .home__hero {
+    flex-direction: column;
+    padding: 48px 24px;
+    text-align: center;
+  }
+  .home__hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .home__hero-cuisine-pills {
+    justify-content: center;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
