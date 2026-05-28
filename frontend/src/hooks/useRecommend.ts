@@ -47,9 +47,10 @@ export function useRecommend() {
         const message = friendlyMessage(err)
         setState({ status: 'error', message, code: err.status })
       } else {
+        const rawMsg = (err as Error).message || 'Unknown network error';
         setState({
           status: 'error',
-          message: 'An unexpected error occurred. Please try again.',
+          message: `${rawMsg} — This is usually caused by a CORS block. Ensure ALLOWED_ORIGINS in Render matches your exact Vercel URL!`,
           code: 0,
         })
       }
