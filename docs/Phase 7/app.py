@@ -67,12 +67,11 @@ def load_system():
     for r in repo.all():
         location_counts[assign_macro_region(r)] += 1
         
-    # Ensure all regions (even empty ones like Delhi) show up for the user
-    for region in MACRO_REGIONS.keys():
-        if region not in location_counts:
-            location_counts[region] = 0
-
-    unique_locations = list(MACRO_REGIONS.keys()) + ["Bangalore - Other"]
+    # Ensure we only show regions that actually have restaurants
+    unique_locations = [region for region in MACRO_REGIONS.keys() if location_counts.get(region, 0) > 0]
+    
+    if location_counts.get("Bangalore - Other", 0) > 0:
+        unique_locations.append("Bangalore - Other")
     
     # Monkey-patch matches_location so the backend understands our macro-regions
     from data import matching
