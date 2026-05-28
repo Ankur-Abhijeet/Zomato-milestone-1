@@ -38,7 +38,7 @@ def load_system():
     repo.load()
     
     # Dynamically extract and sort all unique locations from the dataset
-    unique_locations = sorted(list(set(r.location for r in repo.all() if r.location)))
+    unique_locations = sorted(list(set(r.location_display for r in repo.all() if r.location_display and r.location_display != "Unknown")))
     
     return settings, repo, unique_locations
 
