@@ -1,0 +1,6 @@
+datasets
+pydantic
+pydantic-settings
+python-dotenv
+groq
+streamlit
