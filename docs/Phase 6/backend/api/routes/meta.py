@@ -36,34 +36,34 @@ async def get_meta(settings: SettingsDep, repo: RepoDep) -> MetaResponse:
         "Marathahalli",
         "HSR Layout",
         "Jayanagar",
-        "JP Nagar"
+        "JP Nagar",
+        "BTM",
+        "Electronic City",
+        "Bellandur"
     ]
     
     counts = {region: 0 for region in MACRO_REGIONS}
-    other_blr_count = 0
-    other_india_count = 0
+    others_count = 0
     
     for r in repo.all():
         city_lower = r.city.lower() if r.city else ""
         area_lower = r.area.lower() if r.area else ""
-        if "bangalore" in city_lower or "bengaluru" in city_lower or "bangalore" in area_lower:
-            matched_macro = False
-            for region in MACRO_REGIONS:
-                if region.lower() in area_lower or region.lower() in city_lower:
-                    counts[region] += 1
-                    matched_macro = True
-                    break
-            if not matched_macro:
-                other_blr_count += 1
-        else:
-            other_india_count += 1
+        
+        matched_macro = False
+        for region in MACRO_REGIONS:
+            if region.lower() in area_lower or region.lower() in city_lower:
+                counts[region] += 1
+                matched_macro = True
+                break
+                
+        if not matched_macro:
+            others_count += 1
             
     location_categories = []
     for region in MACRO_REGIONS:
         location_categories.append({"label": region, "query": region, "count": counts[region]})
     
-    location_categories.append({"label": "Anywhere else in Bangalore", "query": "__other_bangalore__", "count": other_blr_count})
-    location_categories.append({"label": "Rest of India", "query": "__other_india__", "count": other_india_count})
+    location_categories.append({"label": "Others", "query": "__others__", "count": others_count})
 
     return MetaResponse(
         budget_bands=budget_band_descriptions(settings),
