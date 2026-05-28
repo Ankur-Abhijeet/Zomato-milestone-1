@@ -108,12 +108,14 @@ with st.sidebar.form("preference_form"):
         format_func=lambda x: f"{x} ({location_counts[x]} restaurants)"
     )
     
-    budget = st.select_slider(
-        "Budget for Two",
-        options=["low", "medium", "high"],
-        value="medium",
-        format_func=lambda x: {"low": "💸 Low (≤ ₹500)", "medium": "💳 Medium", "high": "💎 High (> ₹1,500)"}[x]
+    budget_range = st.slider(
+        "Price Range for Two (₹)", 
+        min_value=150, 
+        max_value=3000, 
+        value=(500, 2000), 
+        step=50
     )
+    min_budget, max_budget = budget_range
     
     # Simple comma-separated cuisines for Streamlit
     cuisines_input = st.text_input("Cuisines (comma separated)", value="")
@@ -136,14 +138,46 @@ if submitted:
             cuisines = [c.strip() for c in cuisines_input.split(",") if c.strip()]
             
             try:
-                # 1. Validate Preferences
+                # Inject the strict budget bounds into the LLM's additional context
+                context_budget = f"Budget is strictly ₹{min_budget} to ₹{max_budget} for two."
+                enhanced_additional = f"{additional} | {context_budget}" if additional.strip() else context_budget
+
+                # 1. Validate Preferences (pass dummy 'medium' to satisfy Pydantic)
                 prefs = validate_preferences({
                     "location": location,
-                    "budget": budget,
+                    "budget": "medium",
                     "cuisines": cuisines,
                     "min_rating": min_rating,
-                    "additional": additional,
+                    "additional": enhanced_additional,
                 })
+                
+                # Monkey-patch the hard filter to use our custom min/max budget range
+                from services.filter import HardConstraintFilter
+                from models.integration import FilterStepCounts, FilterResult
+                from data.matching import matches_location, cuisines_overlap
+                
+                def custom_filter(self, restaurants, preferences):
+                    counts = FilterStepCounts(initial=len(restaurants))
+                    results = list(restaurants)
+
+                    results = [r for r in results if matches_location(r, preferences.location)]
+                    counts.after_location = len(results)
+
+                    results = [r for r in results if r.rating is not None and r.rating >= preferences.min_rating]
+                    counts.after_rating = len(results)
+
+                    # Custom exact cost filtering!
+                    results = [r for r in results if r.cost_inr is not None and min_budget <= r.cost_inr <= max_budget]
+                    counts.after_budget = len(results)
+
+                    cuisine_filter = preferences.cuisines_for_filter()
+                    if cuisine_filter:
+                        results = [r for r in results if cuisines_overlap(r.cuisines, cuisine_filter)]
+                    counts.after_cuisine = len(results)
+
+                    return FilterResult(candidates=results, step_counts=counts, preferences=preferences)
+                
+                HardConstraintFilter.filter = custom_filter
                 
                 # 2. Integration Layer (Filter & Cap)
                 integration_service = IntegrationService(repo, settings)
