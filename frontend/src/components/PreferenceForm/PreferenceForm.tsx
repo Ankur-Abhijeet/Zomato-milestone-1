@@ -120,14 +120,16 @@ export function PreferenceForm({ onSubmit, isLoading, locationCategories }: Prop
             style={{ cursor: 'pointer', appearance: 'auto' }}
           >
             <option value="" disabled>Select a location…</option>
-            {locationCategories ? (
+            {locationCategories && locationCategories.length > 0 ? (
               locationCategories.map((c) => (
                 <option key={c.query} value={c.query}>
                   {c.label} ({c.count.toLocaleString()})
                 </option>
               ))
+            ) : locationCategories !== undefined ? (
+              <option value="" disabled>No categories found</option>
             ) : (
-              <option value="" disabled>Loading locations…</option>
+              <option value="" disabled>Backend updating... Please wait</option>
             )}
           </select>
           {locationError && (
