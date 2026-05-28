@@ -19,6 +19,7 @@ ENV/
 
 # Cache and logs
 .cache/
+!.cache/restaurants.parquet
 *.log
 
 # Editor
