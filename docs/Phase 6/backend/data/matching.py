@@ -5,6 +5,36 @@ from __future__ import annotations
 from data.preprocessor import normalize_city_key, resolve_city_alias
 from models.restaurant import Restaurant
 
+MACRO_REGIONS = sorted([
+    "Banashankari",
+    "Bannerghatta Road",
+    "Basavanagudi",
+    "Bellandur",
+    "Brigade Road",
+    "BTM",
+    "Church Street",
+    "Electronic City",
+    "Frazer Town",
+    "HSR Layout",
+    "Indiranagar",
+    "Jayanagar",
+    "JP Nagar",
+    "Kalyan Nagar",
+    "Kammanahalli",
+    "Koramangala",
+    "Lavelle Road",
+    "Malleshwaram",
+    "Marathahalli",
+    "MG Road",
+    "New BEL Road",
+    "Rajajinagar",
+    "Residency Road",
+    "Richmond Road",
+    "Sarjapur Road",
+    "Ulsoor",
+    "Whitefield"
+])
+
 
 def matches_location(restaurant: Restaurant, query: str) -> bool:
     q = query.strip().lower()
@@ -15,12 +45,8 @@ def matches_location(restaurant: Restaurant, query: str) -> bool:
     if q == "__others__":
         city_lower = restaurant.city.lower() if restaurant.city else ""
         area_lower = restaurant.area.lower() if restaurant.area else ""
-        MACRO_REGIONS = [
-            "koramangala", "indiranagar", "whitefield", "marathahalli", "hsr layout", 
-            "jayanagar", "jp nagar", "btm", "electronic city", "bellandur"
-        ]
         for region in MACRO_REGIONS:
-            if region in area_lower or region in city_lower:
+            if region.lower() in area_lower or region.lower() in city_lower:
                 return False
         return True
 

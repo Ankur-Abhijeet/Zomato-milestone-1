@@ -15,6 +15,7 @@ from fastapi import APIRouter
 from api.deps import RepoDep, SettingsDep
 from api.schemas.response import MetaResponse
 from api.utils.budget import budget_band_descriptions
+from data.matching import MACRO_REGIONS
 
 router = APIRouter(prefix="/api/v1", tags=["meta"])
 
@@ -29,19 +30,6 @@ router = APIRouter(prefix="/api/v1", tags=["meta"])
     ),
 )
 async def get_meta(settings: SettingsDep, repo: RepoDep) -> MetaResponse:
-    MACRO_REGIONS = [
-        "Koramangala",
-        "Indiranagar",
-        "Whitefield",
-        "Marathahalli",
-        "HSR Layout",
-        "Jayanagar",
-        "JP Nagar",
-        "BTM",
-        "Electronic City",
-        "Bellandur"
-    ]
-    
     counts = {region: 0 for region in MACRO_REGIONS}
     others_count = 0
     
