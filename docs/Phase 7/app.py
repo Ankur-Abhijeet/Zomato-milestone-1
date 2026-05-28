@@ -97,48 +97,47 @@ except Exception as e:
 st.sidebar.title("Find Your Perfect Meal")
 st.sidebar.markdown("Tell us what you're craving.")
 
-with st.sidebar.form("preference_form"):
-    # Default to a popular area if available, else the first option
-    default_idx = available_locations.index("Bangalore - South-East (Koramangala, BTM, HSR)") if "Bangalore - South-East (Koramangala, BTM, HSR)" in available_locations else 0
-    
-    location = st.selectbox(
-        "Location / Region*", 
-        options=available_locations, 
-        index=default_idx,
-        format_func=lambda x: f"{x} ({location_counts[x]} restaurants)"
-    )
-    
-    # Peek at the current slider value from session state to calculate the real-time count
-    current_budget = st.session_state.get("budget_slider", (500, 2000))
-    min_b, max_b = current_budget
-    
-    # Calculate how many restaurants match BOTH the selected location and this budget
-    from data import matching
-    matching_count = sum(
-        1 for r in repo.all() 
-        if r.cost_inr is not None 
-        and min_b <= r.cost_inr <= max_b
-        and matching.matches_location(r, location)
-    )
-    
-    budget_range = st.slider(
-        f"Price Range for Two (₹) ({matching_count} available)", 
-        min_value=150, 
-        max_value=3000, 
-        value=(500, 2000), 
-        step=50,
-        key="budget_slider"
-    )
-    min_budget, max_budget = budget_range
-    
-    # Simple comma-separated cuisines for Streamlit
-    cuisines_input = st.text_input("Cuisines (comma separated)", value="")
-    
-    min_rating = st.slider("Minimum Rating", min_value=1.0, max_value=5.0, value=3.0, step=0.1)
-    
-    additional = st.text_area("Specific Cravings or Needs", value="", placeholder="e.g., family friendly, open late")
-    
-    submitted = st.form_submit_button("Get Recommendations")
+# Default to a popular area if available, else the first option
+default_idx = available_locations.index("Bangalore - South-East (Koramangala, BTM, HSR)") if "Bangalore - South-East (Koramangala, BTM, HSR)" in available_locations else 0
+
+location = st.sidebar.selectbox(
+    "Location / Region*", 
+    options=available_locations, 
+    index=default_idx,
+    format_func=lambda x: f"{x} ({location_counts[x]} restaurants)"
+)
+
+# Peek at the current slider value from session state to calculate the real-time count
+current_budget = st.session_state.get("budget_slider", (500, 2000))
+min_b, max_b = current_budget
+
+# Calculate how many restaurants match BOTH the selected location and this budget
+from data import matching
+matching_count = sum(
+    1 for r in repo.all() 
+    if r.cost_inr is not None 
+    and min_b <= r.cost_inr <= max_b
+    and matching.matches_location(r, location)
+)
+
+budget_range = st.sidebar.slider(
+    f"Price Range for Two (₹) ({matching_count} available)", 
+    min_value=150, 
+    max_value=3000, 
+    value=(500, 2000), 
+    step=50,
+    key="budget_slider"
+)
+min_budget, max_budget = budget_range
+
+# Simple comma-separated cuisines for Streamlit
+cuisines_input = st.sidebar.text_input("Cuisines (comma separated)", value="")
+
+min_rating = st.sidebar.slider("Minimum Rating", min_value=1.0, max_value=5.0, value=3.0, step=0.1)
+
+additional = st.sidebar.text_area("Specific Cravings or Needs", value="", placeholder="e.g., family friendly, open late")
+
+submitted = st.sidebar.button("Get Recommendations")
 
 # --- Main Area ---
 st.title("Zomato AI Picks 🍽️")
