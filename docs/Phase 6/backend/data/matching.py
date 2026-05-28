@@ -11,6 +11,25 @@ def matches_location(restaurant: Restaurant, query: str) -> bool:
     if not q:
         return True
 
+    # ── Handle macro-region special queries ───────────────────────────────────
+    if q == "__other_bangalore__":
+        city_lower = restaurant.city.lower() if restaurant.city else ""
+        area_lower = restaurant.area.lower() if restaurant.area else ""
+        if "bangalore" in city_lower or "bengaluru" in city_lower or "bangalore" in area_lower:
+            MACRO_REGIONS = ["koramangala", "indiranagar", "whitefield", "marathahalli", "hsr layout", "jayanagar", "jp nagar"]
+            for region in MACRO_REGIONS:
+                if region in area_lower or region in city_lower:
+                    return False
+            return True
+        return False
+
+    if q == "__other_india__":
+        city_lower = restaurant.city.lower() if restaurant.city else ""
+        area_lower = restaurant.area.lower() if restaurant.area else ""
+        if "bangalore" in city_lower or "bengaluru" in city_lower or "bangalore" in area_lower:
+            return False
+        return True
+
     canonical = resolve_city_alias(query)
     city_key = normalize_city_key(restaurant.city)
     if canonical and (canonical in city_key or city_key in canonical):

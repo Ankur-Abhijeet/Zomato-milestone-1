@@ -170,6 +170,10 @@ class MetaResponse(BaseModel):
             "Marathahalli",
         ]
     )
+    location_categories: List[dict] = Field(
+        default_factory=list,
+        description="Pre-calculated macro-regions and counts for dropdown selection."
+    )
 
 
 # ── Deduplication helper ──────────────────────────────────────────────────────

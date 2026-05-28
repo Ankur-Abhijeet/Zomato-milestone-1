@@ -58,6 +58,11 @@ export interface MetaResponse {
   default_min_rating: number
   default_budget: BudgetChoice
   example_locations: string[]
+  location_categories: {
+    label: string
+    query: string
+    count: number
+  }[]
 }
 
 // ── API Error shape ───────────────────────────────────────────────────────────

@@ -6,6 +6,7 @@ import './PreferenceForm.css'
 interface Props {
   onSubmit: (req: RecommendRequest) => void
   isLoading: boolean
+  locationCategories?: { label: string; query: string; count: number }[]
 }
 
 const BUDGET_OPTIONS: { value: BudgetChoice; label: string; desc: string }[] = [
@@ -14,7 +15,7 @@ const BUDGET_OPTIONS: { value: BudgetChoice; label: string; desc: string }[] = [
   { value: 'high',   label: '💎 High',   desc: '> ₹1,500' },
 ]
 
-export function PreferenceForm({ onSubmit, isLoading }: Props) {
+export function PreferenceForm({ onSubmit, isLoading, locationCategories }: Props) {
   const [location, setLocation]     = useState('')
   const [budget, setBudget]         = useState<BudgetChoice>('medium')
   const [cuisines, setCuisines]     = useState<string[]>([])
@@ -99,19 +100,28 @@ export function PreferenceForm({ onSubmit, isLoading }: Props) {
           <label className="pf__label" htmlFor="pf-location">
             Location <span>*</span>
           </label>
-          <input
+          <select
             id="pf-location"
             className={`pf__input${locationError ? ' pf__input--error' : ''}`}
-            type="text"
-            placeholder="e.g. Bellandur, Koramangala…"
             value={location}
             onChange={(e) => {
               setLocation(e.target.value)
-              if (e.target.value.trim()) setLocationError('')
+              if (e.target.value) setLocationError('')
             }}
             disabled={isLoading}
-            autoComplete="off"
-          />
+            style={{ cursor: 'pointer', appearance: 'auto' }}
+          >
+            <option value="" disabled>Select a location…</option>
+            {locationCategories ? (
+              locationCategories.map((c) => (
+                <option key={c.query} value={c.query}>
+                  {c.label} ({c.count.toLocaleString()})
+                </option>
+              ))
+            ) : (
+              <option value="" disabled>Loading locations…</option>
+            )}
+          </select>
           {locationError && (
             <span className="pf__error" role="alert">⚠ {locationError}</span>
           )}

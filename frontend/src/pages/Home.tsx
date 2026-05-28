@@ -265,7 +265,7 @@ export default function Home() {
             </div>
 
             <div className="home__hero-form-wrapper">
-              <PreferenceForm onSubmit={handleSubmit} isLoading={isLoading} />
+              <PreferenceForm onSubmit={handleSubmit} isLoading={isLoading} locationCategories={meta?.location_categories} />
               {meta && (
                 <div className="home__connected-badge" style={{ borderTop: 'none', marginTop: '12px' }}>
                   <span className="home__connected-dot" />
@@ -326,7 +326,7 @@ export default function Home() {
           {hasResults && (
             <aside className="home__sidebar">
               {showForm ? (
-                <PreferenceForm onSubmit={handleSubmit} isLoading={isLoading} />
+                <PreferenceForm onSubmit={handleSubmit} isLoading={isLoading} locationCategories={meta?.location_categories} />
               ) : (
                 <>
                   <h2 className="home__sidebar-title">Your AI-Powered Picks</h2>
