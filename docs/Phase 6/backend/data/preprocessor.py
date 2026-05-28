@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from typing import Any
+from typing import Any, Iterable
 
 from config.settings import Settings
 from models.restaurant import BudgetBand, Restaurant
@@ -181,10 +181,11 @@ def row_to_restaurant(row: dict[str, Any], settings: Settings) -> Restaurant | N
 
 
 def preprocess_rows(
-    rows: list[dict[str, Any]], settings: Settings
+    rows: Iterable[dict[str, Any]], settings: Settings
 ) -> tuple[list[Restaurant], dict[str, int]]:
+    # We can't know the exact input length anymore since it's a generator
     stats = {
-        "input_rows": len(rows),
+        "input_rows": -1,
         "dropped_missing_name": 0,
         "kept": 0,
         "missing_rating": 0,

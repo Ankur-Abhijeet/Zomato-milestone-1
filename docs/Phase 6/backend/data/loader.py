@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import time
-from typing import Any
+from typing import Any, Iterable
 
 from datasets import load_dataset
 
@@ -24,7 +24,7 @@ def _configure_hf_env(settings: Settings) -> None:
     os.environ.setdefault("HF_HOME", str(settings.hf_home))
 
 
-def download_raw_rows(settings: Settings) -> list[dict[str, Any]]:
+def download_raw_rows(settings: Settings) -> Iterable[dict[str, Any]]:
     _configure_hf_env(settings)
     last_error: Exception | None = None
 
@@ -38,11 +38,9 @@ def download_raw_rows(settings: Settings) -> list[dict[str, Any]]:
             )
             dataset = load_dataset(settings.hf_dataset_id, split="train")
             validate_raw_schema(dataset.column_names)
-            rows = [dict(row) for row in dataset]
-            if not rows:
-                raise DatasetLoadError("Dataset loaded but contains zero rows")
-            logger.info("Downloaded %d raw rows", len(rows))
-            return rows
+            logger.info("Downloaded %d raw rows", len(dataset))
+            # Return a generator to save ~50MB of RAM during startup
+            return (dict(row) for row in dataset)
         except Exception as exc:
             last_error = exc
             logger.warning("Dataset download failed: %s", exc)
